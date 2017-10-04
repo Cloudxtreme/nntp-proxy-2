@@ -69,6 +69,10 @@ func (s *session) dispatchCommand() {
 func (s *session) handleRequests() {
 	if s.backendConnection != nil {
 
+		t := textproto.NewConn(s.UserConnection)
+
+		t.PrintfLine("200 Test")
+
 		for {
 			io.CopyN(s.backendConnection, s.UserConnection, 1024)
 		}
