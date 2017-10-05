@@ -13,9 +13,11 @@ type Configuration struct {
 }
 
 type frontendConfig struct {
-	ListenAddr string `json:"ListenAddr"`
-	ListenPort string `json:"ListenPort"`
-	ListenTLS  bool   `json:"ListenTLS"`
+	frontendAddr 	string 	`json:"frontendAddr"`
+	frontendPort 	string 	`json:"frontendPort"`
+	frontendTLS  	bool   	`json:"frontendTLS"`
+	frontendTLSCert string 	`json:"frontendTLSCert"`
+	frontendTLSKey 	string 	`json:"frontendTLSKey"`
 }
 
 type backendConfig struct {
