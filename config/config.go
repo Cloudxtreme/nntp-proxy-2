@@ -13,25 +13,35 @@ type Configuration struct {
 }
 
 type frontendConfig struct {
-	frontendAddr    string `json:"frontendAddr"`
-	frontendPort    string `json:"frontendPort"`
-	frontendTLS     bool   `json:"frontendTLS"`
-	frontendTLSCert string `json:"frontendTLSCert"`
-	frontendTLSKey  string `json:"frontendTLSKey"`
+	FrontendAddr    string `json:"frontendAddr"`
+	FrontendPort    string `json:"frontendPort"`
+	FrontendTLS     bool   `json:"frontendTLS"`
+	FrontendTLSCert string `json:"frontendTLSCert"`
+	FrontendTLSKey  string `json:"frontendTLSKey"`
 }
 
 type backendConfig struct {
-	ServerAddr string `json:"ListenAddr"`
-	ServerPort string `json:"ListenPort"`
-	ServerTLS  bool   `json:"ListenTLS"`
-	ServerUser string `json:"ServerUser"`
-	ServerPass string `json:"ServerPass"`
-	ServerConn int    `json:"ServerConn"`
+	BackendName  string `json:"backendName"`
+	BackendAddr  string `json:"backendAddr"`
+	BackendPort  string `json:"backendPort"`
+	BackendTLS   bool   `json:"backendTLS"`
+	BackendUser  string `json:"backendUser"`
+	BackendPass  string `json:"backendPass"`
+	BackendConns int    `json:"backendConns"`
 }
 
 type user struct {
 	Username string `json:"Username"`
 	Password string `json:"Password"`
+}
+
+type SelectedBackend struct {
+	BackendAddr  string `json:"backendAddr"`
+	BackendPort  string `json:"backendPort"`
+	BackendTLS   bool   `json:"backendTLS"`
+	BackendUser  string `json:"backendUser"`
+	BackendPass  string `json:"backendPass"`
+	BackendConns int    `json:"backendConns"`
 }
 
 func LoadConfig(path string) Configuration {
