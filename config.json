@@ -1,0 +1,35 @@
+{
+  "Frontend": {
+    "ListenAddr": "0.0.0.0",
+    "ListenPort": "3333",
+    "ListenTLS": false
+  },
+  "Backend": [
+    {
+      "ServerAddr": "nntp.ovpn.to",
+      "ServerPort": "11900",
+      "ServerTLS": false,
+      "ServerUser": "",
+      "ServerPass": "",
+      "ServerConn": 0
+    },
+    {
+      "ServerAddr": "nntp.ovpn.to",
+      "ServerPort": "11900",
+      "ServerTLS": false,
+      "ServerUser": "",
+      "ServerPass": "",
+      "ServerConn": 0
+    }
+  ],
+  "User": [
+    {
+      "Username": "Test",
+      "Password": "Test"
+    },
+    {
+      "Username": "Test2",
+      "Password": "Test2"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"go-nntp-proxy/config"
 	"io"
 	"log"
 	"net"
@@ -25,15 +26,19 @@ type session struct {
 }
 
 func main() {
+
+	config := config.LoadConfig("config.json")
+
 	// Listen for incoming connections.
-	l, err := net.Listen("tcp", host+":"+port)
+	l, err := net.Listen("tcp", config.Frontend.ListenAddr+":"+config.Frontend.ListenPort)
+
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
 		os.Exit(1)
 	}
 	// Close the listener when the application closes.
 	defer l.Close()
-	fmt.Println("Listening on " + host + ":" + port)
+	fmt.Println("Listening on " + config.Frontend.ListenAddr + ":" + config.Frontend.ListenPort)
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.Accept()
