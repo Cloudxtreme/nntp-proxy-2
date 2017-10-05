@@ -22,7 +22,6 @@ type session struct {
 	UserConnection    net.Conn
 	backendConnection net.Conn
 	command           string
-	Authorized        bool
 }
 
 func main() {
@@ -30,7 +29,7 @@ func main() {
 	config := config.LoadConfig("config.json")
 
 	// Listen for incoming connections.
-	l, err := net.Listen("tcp", config.Frontend.ListenAddr+":"+config.Frontend.ListenPort)
+	l, err := net.Listen("tcp", config.Frontend.frontendAddr+":"+config.Frontend.frontendPort)
 
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
@@ -157,7 +156,6 @@ func handleRequest(conn net.Conn) {
 		conn,
 		nil,
 		"",
-		false,
 	}
 
 	c.PrintfLine("200 Welcome to NNTP Proxy!")

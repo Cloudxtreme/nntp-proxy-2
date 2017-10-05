@@ -1,8 +1,10 @@
 {
   "Frontend": {
-    "ListenAddr": "0.0.0.0",
-    "ListenPort": "3333",
-    "ListenTLS": false
+    "frontendAddr": "0.0.0.0",
+    "frontendPort": "3333",
+    "frontendTLS": false,
+    "frontendTLSCert": "",
+    "frontendTLSKey": ""
   },
   "Backend": [
     {

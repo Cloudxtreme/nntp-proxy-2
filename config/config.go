@@ -9,15 +9,15 @@ import (
 type Configuration struct {
 	Frontend frontendConfig
 	Backend  []backendConfig
-	Users    []User
+	Users    []user
 }
 
 type frontendConfig struct {
-	frontendAddr 	string 	`json:"frontendAddr"`
-	frontendPort 	string 	`json:"frontendPort"`
-	frontendTLS  	bool   	`json:"frontendTLS"`
-	frontendTLSCert string 	`json:"frontendTLSCert"`
-	frontendTLSKey 	string 	`json:"frontendTLSKey"`
+	frontendAddr    string `json:"frontendAddr"`
+	frontendPort    string `json:"frontendPort"`
+	frontendTLS     bool   `json:"frontendTLS"`
+	frontendTLSCert string `json:"frontendTLSCert"`
+	frontendTLSKey  string `json:"frontendTLSKey"`
 }
 
 type backendConfig struct {
@@ -29,7 +29,7 @@ type backendConfig struct {
 	ServerConn int    `json:"ServerConn"`
 }
 
-type User struct {
+type user struct {
 	Username string `json:"Username"`
 	Password string `json:"Password"`
 }
