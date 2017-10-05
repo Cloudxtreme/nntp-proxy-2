@@ -11,16 +11,17 @@ import (
 )
 
 const (
-	host = "10.1.0.101"
+	host = "0.0.0.0"
 	port = "3333"
-	user = "XXX"
-	pass = "XXX"
+	user = "XXXX"
+	pass = "XXXX"
 )
 
 type session struct {
 	UserConnection    net.Conn
 	backendConnection net.Conn
 	command           string
+	Authorized        bool
 }
 
 func main() {
@@ -69,14 +70,12 @@ func (s *session) dispatchCommand() {
 func (s *session) handleRequests() {
 	if s.backendConnection != nil {
 
-		t := textproto.NewConn(s.UserConnection)
+		s.backendConnection.Write([]byte(s.command + "\n"))
 
-		t.PrintfLine("200 Test")
+		go io.Copy(s.backendConnection, s.UserConnection)
+		io.Copy(s.UserConnection, s.backendConnection)
 
-		for {
-			io.CopyN(s.backendConnection, s.UserConnection, 1024)
-		}
-
+		//defer s.backendConnection.Close()
 	}
 }
 
@@ -93,7 +92,7 @@ func (s *session) handleAuth(args []string) {
 		return
 	}
 
-	t.PrintfLine("350 Continue")
+	t.PrintfLine("381 Continue")
 
 	a, _ := t.ReadLine()
 	parts := strings.SplitN(a, " ", 3)
@@ -105,11 +104,32 @@ func (s *session) handleAuth(args []string) {
 
 	if args[1] == "Test" && parts[2] == "Test" {
 
+		// New backend connection to upstream NNTP
 		conn, err := net.Dial("tcp", "nntp.ovpn.to:11900")
 
-		conn.Write([]byte("AUTHINFO USER " + user + "\n"))
-		conn.Write([]byte("AUTHINFO PASS " + pass + "\n"))
-		conn.Write([]byte("ARTICLE <part15of66.maG0joHg6Vj2Hy4TLsBs@powerpost2000AA.local>" + "\n"))
+		c := textproto.NewConn(conn)
+
+		_, _, err = c.ReadCodeLine(200)
+		if err != nil {
+			return
+		}
+
+		err = c.PrintfLine("authinfo user %s", user)
+
+		if err != nil {
+			return
+		}
+
+		_, _, err = c.ReadCodeLine(381)
+		if err != nil {
+			return
+		}
+
+		err = c.PrintfLine("authinfo pass %s", pass)
+		if err != nil {
+			return
+		}
+		_, _, err = c.ReadCodeLine(281)
 
 		if err == nil {
 			t.PrintfLine("281 Welcome")
@@ -132,12 +152,15 @@ func handleRequest(conn net.Conn) {
 		conn,
 		nil,
 		"",
+		false,
 	}
 
 	c.PrintfLine("200 Welcome to NNTP Proxy!")
+
 	for {
 		l, err := c.ReadLine()
 		if err != nil {
+
 			log.Printf("Error reading from client, dropping conn: %v", err)
 			conn.Close()
 			return
