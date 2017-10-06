@@ -3,35 +3,28 @@
     "frontendAddr": "0.0.0.0",
     "frontendPort": "3333",
     "frontendTLS": false,
-    "frontendTLSCert": "",
-    "frontendTLSKey": ""
+    "frontendTLSCert": "cert.pem",
+    "frontendTLSKey": "key.pem"
   },
   "Backend": [
     {
-      "ServerAddr": "nntp.ovpn.to",
-      "ServerPort": "11900",
-      "ServerTLS": false,
-      "ServerUser": "",
-      "ServerPass": "",
-      "ServerConn": 0
-    },
-    {
-      "ServerAddr": "nntp.ovpn.to",
-      "ServerPort": "11900",
-      "ServerTLS": false,
-      "ServerUser": "",
-      "ServerPass": "",
-      "ServerConn": 0
+      "backendName": "Usenet Farm",
+      "backendAddr": "news.usenet.farm",
+      "backendPort": "563",
+      "backendTLS": true,
+      "backendUser": "XXX",
+      "backendPass": "XXX",
+      "backendConns": 4
     }
   ],
-  "User": [
+  "Users": [
     {
       "Username": "Test",
-      "Password": "Test"
+      "Password": "$2a$12$r3T1xyHbpAh2Jks3hlb.8OJKtzQZVTiNgi6bMROJeTVWboS3HsTkK"
     },
     {
       "Username": "Test2",
-      "Password": "Test2"
+      "Password": "$2a$12$r3T1xyHbpAh2Jks3hlb.8OJKtzQZVTiNgi6bMROJeTVWboS3HsTkK"
     }
   ]
 }

@@ -110,7 +110,7 @@ func (s *session) dispatchCommand() {
 	if strings.ToLower(cmd[0]) == "authinfo" {
 		s.handleAuth(args)
 	} else {
-		go s.handleRequests()
+		s.handleRequests()
 	}
 
 }
@@ -123,7 +123,6 @@ func (s *session) handleRequests() {
 		go io.Copy(s.backendConnection, s.UserConnection)
 		io.Copy(s.UserConnection, s.backendConnection)
 
-		//defer s.backendConnection.Close()
 	}
 }
 
@@ -177,16 +176,44 @@ func (s *session) handleAuth(args []string) {
 
 		for _, elem := range cfg.Backend {
 			if elem.BackendConns >= backendConnections[elem.BackendName] {
-				selectedBackend = elem
-
+				selectedBackend.BackendAddr = elem.BackendAddr
+				selectedBackend.BackendPort = elem.BackendPort
+				selectedBackend.BackendTLS = elem.BackendTLS
+				selectedBackend.BackendUser = elem.BackendUser
+				selectedBackend.BackendPass = elem.BackendPass
 			} else {
 				t.PrintfLine("502 NO free backend connection!")
 				return
 			}
 		}
 
-		// New backend connection to upstream NNTP
-		conn, err := net.Dial("tcp", selectedBackend.BackendAddr+":"+selectedBackend.BackendPort)
+		var conn net.Conn
+		var err error
+
+		if selectedBackend.BackendTLS {
+
+			conf := &tls.Config{
+				InsecureSkipVerify: true,
+			}
+
+			conn, err = tls.Dial("tcp", selectedBackend.BackendAddr + ":" + selectedBackend.BackendPort, conf)
+
+			if err != nil {
+				log.Printf("%v" , err)
+				return
+			}
+
+		} else {
+			// New backend connection to upstream NNTP
+			conn, err = net.Dial("tcp", selectedBackend.BackendAddr+":"+selectedBackend.BackendPort)
+
+			if err != nil {
+				log.Printf("%v" , err)
+				return
+			}
+
+
+		}
 
 		c := textproto.NewConn(conn)
 
@@ -248,8 +275,8 @@ func handleRequest(conn net.Conn) {
 		l, err := c.ReadLine()
 		if err != nil {
 
-			log.Printf("Error reading from client, dropping conn: %v", err)
-			if len(sess.selectedBackend.BackendName) > 0 {
+			log.Printf("Error reading from client, dropping conn: %T %+v", err, err)
+			if sess.selectedBackend != nil && len(sess.selectedBackend.BackendName) > 0 {
 				backendConnections[sess.selectedBackend.BackendName] -= 1
 			} else {
 				sess.selectedBackend = nil
