@@ -13,11 +13,16 @@ type Configuration struct {
 }
 
 type frontendConfig struct {
-	FrontendAddr    string `json:"frontendAddr"`
-	FrontendPort    string `json:"frontendPort"`
-	FrontendTLS     bool   `json:"frontendTLS"`
-	FrontendTLSCert string `json:"frontendTLSCert"`
-	FrontendTLSKey  string `json:"frontendTLSKey"`
+	FrontendAddr            string             `json:"frontendAddr"`
+	FrontendPort            string             `json:"frontendPort"`
+	FrontendTLS             bool               `json:"frontendTLS"`
+	FrontendTLSCert         string             `json:"frontendTLSCert"`
+	FrontendTLSKey          string             `json:"frontendTLSKey"`
+	FrontendAllowedCommands []frontendCommands `json:"frontendAllowedCommands"`
+}
+
+type frontendCommands struct {
+	FrontendCommand string `json:"frontendCommand"`
 }
 
 type backendConfig struct {

@@ -4,16 +4,24 @@
     "frontendPort": "3333",
     "frontendTLS": false,
     "frontendTLSCert": "cert.pem",
-    "frontendTLSKey": "key.pem"
+    "frontendTLSKey": "key.pem",
+    "frontendAllowedCommands": [
+      {
+        "frontendCommand": "ARTICLE"
+      },
+      {
+        "frontendCommand": "BODY"
+      }
+    ]
   },
   "Backend": [
     {
-      "backendName": "Usenet Farm",
-      "backendAddr": "news.usenet.farm",
-      "backendPort": "563",
+      "backendName": "NNTP oVPN - 1",
+      "backendAddr": "nntp.ovpn.to",
+      "backendPort": "1563",
       "backendTLS": true,
-      "backendUser": "XXX",
-      "backendPass": "XXX",
+      "backendUser": "XXXX",
+      "backendPass": "XXXX",
       "backendConns": 4
     }
   ],

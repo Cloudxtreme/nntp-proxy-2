@@ -25,6 +25,28 @@ type session struct {
 	selectedBackend   *config.SelectedBackend
 }
 
+// Utils
+func HashPassword(password string) string {
+	bytes, _ := bcrypt.GenerateFromPassword([]byte(password), 10)
+	return string(bytes)
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+func isCommandAllowed(command string) bool {
+	for _, elem := range cfg.Frontend.FrontendAllowedCommands {
+		if strings.ToLower(elem.FrontendCommand) == strings.ToLower(command) {
+			return true
+		}
+	}
+	return false
+}
+
+// Utils
+
 func main() {
 
 	cfg = config.LoadConfig("config.json")
@@ -95,7 +117,6 @@ func main() {
 }
 
 func (s *session) dispatchCommand() {
-
 	log.Println("Dispatch")
 	log.Printf("Command : %v", s.command)
 
@@ -110,9 +131,16 @@ func (s *session) dispatchCommand() {
 	if strings.ToLower(cmd[0]) == "authinfo" {
 		s.handleAuth(args)
 	} else {
-		s.handleRequests()
-	}
+		if isCommandAllowed(strings.ToLower(cmd[0])) {
+			s.handleRequests()
+		} else {
+			t := textproto.NewConn(s.UserConnection)
 
+			t.PrintfLine("502 %s not allowed", cmd[0])
+			return
+		}
+
+	}
 }
 
 func (s *session) handleRequests() {
@@ -122,29 +150,16 @@ func (s *session) handleRequests() {
 
 		go io.Copy(s.backendConnection, s.UserConnection)
 		io.Copy(s.UserConnection, s.backendConnection)
-
 	}
 }
 
-func HashPassword(password string) string {
-	bytes, _ := bcrypt.GenerateFromPassword([]byte(password), 10)
-	return string(bytes)
-}
-
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
-
 func (s *session) handleAuthorization(user string, password string) bool {
-
 	for _, elem := range cfg.Users {
 		if elem.Username == user && CheckPasswordHash(password, elem.Password) {
 			return true
 		}
 	}
 	return false
-
 }
 
 func (s *session) handleAuth(args []string) {
@@ -196,10 +211,10 @@ func (s *session) handleAuth(args []string) {
 				InsecureSkipVerify: true,
 			}
 
-			conn, err = tls.Dial("tcp", selectedBackend.BackendAddr + ":" + selectedBackend.BackendPort, conf)
+			conn, err = tls.Dial("tcp", selectedBackend.BackendAddr+":"+selectedBackend.BackendPort, conf)
 
 			if err != nil {
-				log.Printf("%v" , err)
+				log.Printf("%v", err)
 				return
 			}
 
@@ -208,11 +223,9 @@ func (s *session) handleAuth(args []string) {
 			conn, err = net.Dial("tcp", selectedBackend.BackendAddr+":"+selectedBackend.BackendPort)
 
 			if err != nil {
-				log.Printf("%v" , err)
+				log.Printf("%v", err)
 				return
 			}
-
-
 		}
 
 		c := textproto.NewConn(conn)
@@ -247,6 +260,7 @@ func (s *session) handleAuth(args []string) {
 
 			return
 		} else {
+			log.Printf("%v", err)
 			t.PrintfLine("502 ERROR!")
 			return
 		}
@@ -254,7 +268,6 @@ func (s *session) handleAuth(args []string) {
 	} else {
 		t.PrintfLine("502 AUTH FAILED!")
 	}
-
 }
 
 // Handles incoming requests.
