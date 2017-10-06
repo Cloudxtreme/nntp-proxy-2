@@ -22,6 +22,7 @@ type session struct {
 	UserConnection    net.Conn
 	backendConnection net.Conn
 	command           string
+	selectedBackend   *config.SelectedBackend
 }
 
 func main() {
@@ -172,15 +173,20 @@ func (s *session) handleAuth(args []string) {
 
 	if s.handleAuthorization(args[1], parts[2]) {
 
-		for _, elem := range cfg.Backend {
-			if elem.BackendConns < backendConnections[elem.BackendName] {
+		selectedBackend := &config.SelectedBackend{}
 
+		for _, elem := range cfg.Backend {
+			if elem.BackendConns >= backendConnections[elem.BackendName] {
+				selectedBackend = elem
+
+			} else {
+				t.PrintfLine("502 NO free backend connection!")
+				return
 			}
-			backendConnections[elem.BackendName] = 0
 		}
 
 		// New backend connection to upstream NNTP
-		conn, err := net.Dial("tcp", "nntp.ovpn.to:11900")
+		conn, err := net.Dial("tcp", selectedBackend.BackendAddr+":"+selectedBackend.BackendPort)
 
 		c := textproto.NewConn(conn)
 
@@ -189,7 +195,7 @@ func (s *session) handleAuth(args []string) {
 			return
 		}
 
-		err = c.PrintfLine("authinfo user %s", "")
+		err = c.PrintfLine("authinfo user %s", selectedBackend.BackendUser)
 
 		if err != nil {
 			return
@@ -200,7 +206,7 @@ func (s *session) handleAuth(args []string) {
 			return
 		}
 
-		err = c.PrintfLine("authinfo pass %s", "")
+		err = c.PrintfLine("authinfo pass %s", selectedBackend.BackendPass)
 		if err != nil {
 			return
 		}
@@ -209,6 +215,9 @@ func (s *session) handleAuth(args []string) {
 		if err == nil {
 			t.PrintfLine("281 Welcome")
 			s.backendConnection = conn
+			backendConnections[selectedBackend.BackendName] += 1
+			s.selectedBackend = selectedBackend
+
 			return
 		} else {
 			t.PrintfLine("502 ERROR!")
@@ -230,6 +239,7 @@ func handleRequest(conn net.Conn) {
 		conn,
 		nil,
 		"",
+		nil,
 	}
 
 	c.PrintfLine("200 Welcome to NNTP Proxy!")
@@ -239,6 +249,12 @@ func handleRequest(conn net.Conn) {
 		if err != nil {
 
 			log.Printf("Error reading from client, dropping conn: %v", err)
+			if len(sess.selectedBackend.BackendName) > 0 {
+				backendConnections[sess.selectedBackend.BackendName] -= 1
+			} else {
+				sess.selectedBackend = nil
+			}
+
 			conn.Close()
 			return
 

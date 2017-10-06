@@ -36,12 +36,13 @@ type user struct {
 }
 
 type SelectedBackend struct {
-	BackendAddr  string `json:"backendAddr"`
-	BackendPort  string `json:"backendPort"`
-	BackendTLS   bool   `json:"backendTLS"`
-	BackendUser  string `json:"backendUser"`
-	BackendPass  string `json:"backendPass"`
-	BackendConns int    `json:"backendConns"`
+	BackendName  string
+	BackendAddr  string
+	BackendPort  string
+	BackendTLS   bool
+	BackendUser  string
+	BackendPass  string
+	BackendConns int
 }
 
 func LoadConfig(path string) Configuration {
