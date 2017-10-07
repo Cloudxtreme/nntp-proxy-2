@@ -1,10 +1,10 @@
-package config
+/*
+ * Copyright (c) 2017. akarl
+ *
+ *
+ */
 
-import (
-	"encoding/json"
-	"io/ioutil"
-	"log"
-)
+package config
 
 type Configuration struct {
 	Frontend frontendConfig
@@ -48,19 +48,4 @@ type SelectedBackend struct {
 	BackendUser  string
 	BackendPass  string
 	BackendConns int
-}
-
-func LoadConfig(path string) Configuration {
-	file, err := ioutil.ReadFile(path)
-	if err != nil {
-		log.Fatal("Config File Missing. ", err)
-	}
-
-	var config Configuration
-	err = json.Unmarshal(file, &config)
-	if err != nil {
-		log.Fatal("Config Parse Error: ", err)
-	}
-
-	return config
 }
