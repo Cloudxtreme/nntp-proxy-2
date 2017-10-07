@@ -6,11 +6,6 @@
 
 package config
 
-import (
-	"io/ioutil"
-	"log"
-	"encoding/json"
-)
 
 type Configuration struct {
 	Frontend frontendConfig
