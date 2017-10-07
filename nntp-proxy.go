@@ -3,7 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
-	"go-nntp-proxy/config"
+	"git.darknebu.la/akarl/go-nntp-proxy/config"
 	"golang.org/x/crypto/bcrypt"
 	"io"
 	"log"
