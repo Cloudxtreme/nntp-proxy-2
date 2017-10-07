@@ -6,6 +6,12 @@
 
 package config
 
+import (
+	"io/ioutil"
+	"log"
+	"encoding/json"
+)
+
 type Configuration struct {
 	Frontend frontendConfig
 	Backend  []backendConfig
@@ -48,4 +54,19 @@ type SelectedBackend struct {
 	BackendUser  string
 	BackendPass  string
 	BackendConns int
+}
+
+func LoadConfig(path string) Configuration {
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatal("Config File Missing. ", err)
+	}
+
+	var config Configuration
+	err = json.Unmarshal(file, &config)
+	if err != nil {
+		log.Fatal("Config Parse Error: ", err)
+	}
+
+	return config
 }
