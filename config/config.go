@@ -6,11 +6,17 @@
 
 package config
 
+import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
+)
 
 type Configuration struct {
 	Frontend frontendConfig
 	Backend  []backendConfig
 	Users    []user
+	SelectedBackend
 }
 
 type frontendConfig struct {
