@@ -2,17 +2,17 @@ package main
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
-	"git.darknebu.la/akarl/go-nntp-proxy/config"
+	"github.com/twink0r/nntp-proxy/config"
 	"golang.org/x/crypto/bcrypt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/textproto"
 	"os"
 	"strings"
-	"encoding/json"
-	"io/ioutil"
 )
 
 var (
@@ -48,20 +48,19 @@ func isCommandAllowed(command string) bool {
 }
 
 func LoadConfig(path string) config.Configuration {
-        file, err := ioutil.ReadFile(path)
-        if err != nil {
-                log.Fatal("Config File Missing. ", err)
-        }
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatal("Config File Missing. ", err)
+	}
 
-        var configType config.Configuration
-        err = json.Unmarshal(file, &configType)
-        if err != nil {
-                log.Fatal("Config Parse Error: ", err)
-        }
+	var configType config.Configuration
+	err = json.Unmarshal(file, &configType)
+	if err != nil {
+		log.Fatal("Config Parse Error: ", err)
+	}
 
-        return configType
+	return configType
 }
-
 
 // Utils
 
