@@ -11,6 +11,8 @@ import (
 	"net/textproto"
 	"os"
 	"strings"
+	"encoding/json"
+	"io/ioutil"
 )
 
 var (
@@ -45,11 +47,27 @@ func isCommandAllowed(command string) bool {
 	return false
 }
 
+func LoadConfig(path string) config.Configuration {
+        file, err := ioutil.ReadFile(path)
+        if err != nil {
+                log.Fatal("Config File Missing. ", err)
+        }
+
+        var configType config.Configuration
+        err = json.Unmarshal(file, &configType)
+        if err != nil {
+                log.Fatal("Config Parse Error: ", err)
+        }
+
+        return configType
+}
+
+
 // Utils
 
 func main() {
 
-	cfg = config.LoadConfig("config.json")
+	cfg = LoadConfig("config.json")
 
 	backendConnections = make(map[string]int)
 
