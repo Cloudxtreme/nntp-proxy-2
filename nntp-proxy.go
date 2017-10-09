@@ -66,7 +66,7 @@ func LoadConfig(path string) config.Configuration {
 
 func main() {
 
-	cfg = LoadConfig("config.json")
+	cfg = LoadConfig("/config/config.json")
 
 	backendConnections = make(map[string]int)
 

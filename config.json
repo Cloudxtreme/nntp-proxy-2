@@ -16,10 +16,10 @@
   },
   "Backend": [
     {
-      "backendName": "NNTP oVPN - 1",
+      "backendName": "ovpn.to - 1",
       "backendAddr": "nntp.ovpn.to",
-      "backendPort": "1563",
-      "backendTLS": true,
+      "backendPort": "11900",
+      "backendTLS": false,
       "backendUser": "XXXX",
       "backendPass": "XXXX",
       "backendConns": 4
