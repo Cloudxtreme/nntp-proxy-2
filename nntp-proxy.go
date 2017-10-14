@@ -91,7 +91,7 @@ func main() {
 	var l net.Listener
 
 	http.HandleFunc("/backendStatus", httpHandler)
-	log.Fatal(http.ListenAndServe(cfg.Frontend.FrontendHTTPAddr+":"+cfg.Frontend.FrontendHTTPPort, nil))
+	go log.Fatal(http.ListenAndServe(cfg.Frontend.FrontendHTTPAddr+":"+cfg.Frontend.FrontendHTTPPort, nil))
 
 
 	if cfg.Frontend.FrontendTLS {
