@@ -71,8 +71,8 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 
-	for key, elem := range backendConnections {
-		fmt.Fprintf(w, "%v - %v \n", key, elem)
+	for _, elem := range cfg.Backend {
+		fmt.Fprintf(w, "%v - %v / %v\n", elem.BackendName, backendConnections[elem.BackendName], elem.BackendConns)
 	}
 }
 
@@ -92,7 +92,6 @@ func main() {
 
 	http.HandleFunc("/backendStatus", httpHandler)
 	go http.ListenAndServe(cfg.Frontend.FrontendHTTPAddr+":"+cfg.Frontend.FrontendHTTPPort, nil)
-
 
 	if cfg.Frontend.FrontendTLS {
 
@@ -225,13 +224,14 @@ func (s *session) handleAuth(args []string) {
 		selectedBackend := &config.SelectedBackend{}
 
 		for _, elem := range cfg.Backend {
-			if elem.BackendConns >= backendConnections[elem.BackendName] {
+			if backendConnections[elem.BackendName] <= elem.BackendConns {
 				selectedBackend.BackendName = elem.BackendName
 				selectedBackend.BackendAddr = elem.BackendAddr
 				selectedBackend.BackendPort = elem.BackendPort
 				selectedBackend.BackendTLS = elem.BackendTLS
 				selectedBackend.BackendUser = elem.BackendUser
 				selectedBackend.BackendPass = elem.BackendPass
+				break
 			} else {
 				t.PrintfLine("502 NO free backend connection!")
 				return
@@ -298,6 +298,7 @@ func (s *session) handleAuth(args []string) {
 		} else {
 			log.Printf("%v", err)
 			t.PrintfLine("502 Backend AUTH Failed!")
+			//log.Printf("%v - Backend Auth Failed",s.selectedBackend.BackendName)
 			return
 		}
 
@@ -323,8 +324,6 @@ func handleRequest(conn net.Conn) {
 	for {
 		l, err := c.ReadLine()
 		if err != nil {
-
-			log.Printf("Error reading from client, dropping conn: %T %+v", err, err)
 			if sess.selectedBackend != nil && len(sess.selectedBackend.BackendName) > 0 {
 				backendConnections[sess.selectedBackend.BackendName] -= 1
 				log.Printf("Dropping Backend Connection: %v", sess.selectedBackend.BackendName)
