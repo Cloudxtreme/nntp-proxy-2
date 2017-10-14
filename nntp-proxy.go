@@ -72,7 +72,7 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	for key, elem := range backendConnections {
-		fmt.Fprintf(w, "%v - %v", key, elem)
+		fmt.Fprintf(w, "%v - %v \n", key, elem)
 	}
 }
 
