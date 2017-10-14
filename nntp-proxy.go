@@ -308,7 +308,9 @@ func handleRequest(conn net.Conn) {
 			log.Printf("Error reading from client, dropping conn: %T %+v", err, err)
 			if sess.selectedBackend != nil && len(sess.selectedBackend.BackendName) > 0 {
 				backendConnections[sess.selectedBackend.BackendName] -= 1
+				log.Printf("Dropping Backend Connection: %v", sess.selectedBackend.BackendName)
 			} else {
+				log.Printf("Error dropping Backend Connection cause selectedBackend is nil")
 				sess.selectedBackend = nil
 			}
 
