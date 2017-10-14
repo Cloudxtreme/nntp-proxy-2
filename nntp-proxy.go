@@ -233,9 +233,13 @@ func (s *session) handleAuth(args []string) {
 				selectedBackend.BackendPass = elem.BackendPass
 				break
 			} else {
-				t.PrintfLine("502 NO free backend connection!")
-				return
+				continue
 			}
+		}
+
+		if selectedBackend == nil {
+			t.PrintfLine("502 NO free backend connection!")
+			return
 		}
 
 		var conn net.Conn
