@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"net/http"
 	"net/textproto"
 	"os"
 	"strings"
@@ -64,6 +65,21 @@ func LoadConfig(path string) config.Configuration {
 
 // Utils
 
+// HTTP HANDLE
+
+func httpHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+
+	w.Header().Set("Content-Length", fmt.Sprint(len(data)))
+
+	for key, elem := range backendConnections {
+		fmt.Fprintf(w, "%v - %v", key, elem)
+	}
+}
+
+// HTTP HANDLE
+
 func main() {
 
 	cfg = LoadConfig("/config/config.json")
@@ -75,6 +91,9 @@ func main() {
 	}
 
 	var l net.Listener
+
+	http.ListenAndServe(cfg.Frontend.FrontendHTTPAddr+":"+cfg.Frontend.FrontendHTTPPort, nil)
+	http.HandleFunc("/backendStatus", httpHandler)
 
 	if cfg.Frontend.FrontendTLS {
 

@@ -19,6 +19,8 @@ type frontendConfig struct {
 	FrontendTLS             bool               `json:"frontendTLS"`
 	FrontendTLSCert         string             `json:"frontendTLSCert"`
 	FrontendTLSKey          string             `json:"frontendTLSKey"`
+	FrontendHTTPAddr        string             `json:"frontendHTTPAddr"`
+	FrontendHTTPPort        string             `json:"frontendHTTPPort"`
 	FrontendAllowedCommands []frontendCommands `json:"frontendAllowedCommands"`
 }
 
@@ -50,4 +52,3 @@ type SelectedBackend struct {
 	BackendPass  string
 	BackendConns int
 }
-
