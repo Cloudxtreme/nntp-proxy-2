@@ -226,6 +226,7 @@ func (s *session) handleAuth(args []string) {
 
 		for _, elem := range cfg.Backend {
 			if elem.BackendConns >= backendConnections[elem.BackendName] {
+				selectedBackend.BackendName = elem.BackendName
 				selectedBackend.BackendAddr = elem.BackendAddr
 				selectedBackend.BackendPort = elem.BackendPort
 				selectedBackend.BackendTLS = elem.BackendTLS
@@ -296,7 +297,7 @@ func (s *session) handleAuth(args []string) {
 			return
 		} else {
 			log.Printf("%v", err)
-			t.PrintfLine("502 ERROR!")
+			t.PrintfLine("502 Backend AUTH Failed!")
 			return
 		}
 
