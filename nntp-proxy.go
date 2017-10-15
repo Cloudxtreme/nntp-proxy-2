@@ -238,7 +238,7 @@ func (s *session) handleAuth(args []string) {
 			}
 		}
 
-		if selectedBackend == nil {
+		if len(selectedBackend.BackendAddr) == 0 && len(selectedBackend.BackendPort) == 0 {
 			t.PrintfLine("502 NO free backend connection!")
 			return
 		}
