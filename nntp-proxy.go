@@ -80,7 +80,7 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	cfg = LoadConfig("config.json")
+	cfg = LoadConfig("/config/config.json")
 
 	backendConnections = make(map[string]int)
 
