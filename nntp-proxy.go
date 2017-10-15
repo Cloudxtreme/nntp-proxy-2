@@ -165,8 +165,9 @@ func (s *session) dispatchCommand() {
 	if strings.ToLower(cmd[0]) == "authinfo" {
 		s.handleAuth(args)
 	} else if strings.ToLower(cmd[0]) == "quit" {
-		s.selectedBackend = nil
 		s.backendConnection.Close()
+		backendConnections[s.selectedBackend.BackendName] -= 1
+		s.selectedBackend = nil
 	} else {
 		if isCommandAllowed(strings.ToLower(cmd[0])) {
 			s.handleRequests()
