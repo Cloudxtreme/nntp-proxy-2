@@ -164,10 +164,6 @@ func (s *session) dispatchCommand() {
 
 	if strings.ToLower(cmd[0]) == "authinfo" {
 		s.handleAuth(args)
-	} else if strings.ToLower(cmd[0]) == "quit" {
-		s.backendConnection.Close()
-		backendConnections[s.selectedBackend.BackendName] -= 1
-		s.selectedBackend = nil
 	} else {
 		if isCommandAllowed(strings.ToLower(cmd[0])) {
 			s.handleRequests()
@@ -226,8 +222,8 @@ func (s *session) handleAuth(args []string) {
 	if s.handleAuthorization(args[1], parts[2]) {
 		selectedBackend := &config.SelectedBackend{}
 		for _, elem := range cfg.Backend {
-			if backendConnections[elem.BackendName] < elem.BackendConns {
 
+			if backendConnections[elem.BackendName] < elem.BackendConns {
 				selectedBackend.BackendName = elem.BackendName
 				selectedBackend.BackendAddr = elem.BackendAddr
 				selectedBackend.BackendPort = elem.BackendPort
@@ -236,7 +232,6 @@ func (s *session) handleAuth(args []string) {
 				selectedBackend.BackendPass = elem.BackendPass
 
 				backendConnections[elem.BackendName] += 1
-
 				break
 			} else {
 				continue
@@ -261,6 +256,7 @@ func (s *session) handleAuth(args []string) {
 
 			if err != nil {
 				log.Printf("%v", err)
+				log.Printf("%v:%v", selectedBackend.BackendAddr, selectedBackend.BackendPort)
 				return
 			}
 
@@ -270,6 +266,7 @@ func (s *session) handleAuth(args []string) {
 
 			if err != nil {
 				log.Printf("%v", err)
+				log.Printf("%v:%v", selectedBackend.BackendAddr, selectedBackend.BackendPort)
 				return
 			}
 		}
@@ -339,7 +336,9 @@ func handleRequest(conn net.Conn) {
 				log.Printf("[CONN] Dropping Backend Connection: %v", sess.selectedBackend.BackendName)
 			} else {
 				log.Printf("[CONN] Error dropping Backend Connection cause selectedBackend is nil")
+				log.Printf("%v", sess)
 				sess.selectedBackend = nil
+
 			}
 
 			conn.Close()
