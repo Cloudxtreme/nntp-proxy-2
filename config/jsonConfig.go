@@ -44,11 +44,10 @@ type user struct {
 }
 
 type SelectedBackend struct {
-	BackendName  string
-	BackendAddr  string
-	BackendPort  string
-	BackendTLS   bool
-	BackendUser  string
-	BackendPass  string
-	BackendConns int
+	BackendName string
+	BackendAddr string
+	BackendPort string
+	BackendTLS  bool
+	BackendUser string
+	BackendPass string
 }

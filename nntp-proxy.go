@@ -80,7 +80,7 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	cfg = LoadConfig("/config/config.json")
+	cfg = LoadConfig("config.json")
 
 	backendConnections = make(map[string]int)
 
@@ -151,8 +151,8 @@ func main() {
 }
 
 func (s *session) dispatchCommand() {
-	log.Println("Dispatch")
-	log.Printf("Command : %v", s.command)
+
+	log.Printf("[Dispatch] Command : %v", s.command)
 
 	cmd := strings.Split(s.command, " ")
 
@@ -220,17 +220,19 @@ func (s *session) handleAuth(args []string) {
 	}
 
 	if s.handleAuthorization(args[1], parts[2]) {
-
 		selectedBackend := &config.SelectedBackend{}
-
 		for _, elem := range cfg.Backend {
-			if backendConnections[elem.BackendName] <= elem.BackendConns {
+			if backendConnections[elem.BackendName] < elem.BackendConns {
+
 				selectedBackend.BackendName = elem.BackendName
 				selectedBackend.BackendAddr = elem.BackendAddr
 				selectedBackend.BackendPort = elem.BackendPort
 				selectedBackend.BackendTLS = elem.BackendTLS
 				selectedBackend.BackendUser = elem.BackendUser
 				selectedBackend.BackendPass = elem.BackendPass
+
+				backendConnections[elem.BackendName] += 1
+
 				break
 			} else {
 				continue
@@ -295,14 +297,14 @@ func (s *session) handleAuth(args []string) {
 		if err == nil {
 			t.PrintfLine("281 Welcome")
 			s.backendConnection = conn
-			backendConnections[selectedBackend.BackendName] += 1
 			s.selectedBackend = selectedBackend
+			log.Printf("[CONN] Connecting to Backend: %v", selectedBackend.BackendName)
 
 			return
 		} else {
 			log.Printf("%v", err)
+			backendConnections[selectedBackend.BackendName] -= 1
 			t.PrintfLine("502 Backend AUTH Failed!")
-			//log.Printf("%v - Backend Auth Failed",s.selectedBackend.BackendName)
 			return
 		}
 
@@ -330,9 +332,9 @@ func handleRequest(conn net.Conn) {
 		if err != nil {
 			if sess.selectedBackend != nil && len(sess.selectedBackend.BackendName) > 0 {
 				backendConnections[sess.selectedBackend.BackendName] -= 1
-				log.Printf("Dropping Backend Connection: %v", sess.selectedBackend.BackendName)
+				log.Printf("[CONN] Dropping Backend Connection: %v", sess.selectedBackend.BackendName)
 			} else {
-				log.Printf("Error dropping Backend Connection cause selectedBackend is nil")
+				log.Printf("[CONN] Error dropping Backend Connection cause selectedBackend is nil")
 				sess.selectedBackend = nil
 			}
 
